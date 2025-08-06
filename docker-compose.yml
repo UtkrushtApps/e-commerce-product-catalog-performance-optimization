@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./data/pgdata:/var/lib/postgresql/data
+      - ./init_database.sql:/docker-entrypoint-initdb.d/init_database.sql
+    command: postgres -c log_statement=all
+    environment:
+      - POSTGRES_DB=utkrusht_db
+      - POSTGRES_USER=utkrusht
+      - POSTGRES_PASSWORD=skills123
+    networks:
+      - utkrushtnet
+  fastapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    ports:
+      - "8000:8000"
+    working_dir: /root/task
+    networks:
+      - utkrushtnet
+networks:
+  utkrushtnet:
+    driver: bridge
